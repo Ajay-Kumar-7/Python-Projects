@@ -1,0 +1,174 @@
+<html>
+<head>
+<title>app.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+.s3 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+app.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">numpy </span><span class="s0">as </span><span class="s1">np</span>
+<span class="s0">import </span><span class="s1">pandas </span><span class="s0">as </span><span class="s1">pd</span>
+<span class="s0">import </span><span class="s1">plotly.graph_objs </span><span class="s0">as </span><span class="s1">go</span>
+<span class="s0">import </span><span class="s1">dash</span>
+<span class="s0">import </span><span class="s1">dash_html_components </span><span class="s0">as </span><span class="s1">html</span>
+<span class="s0">from </span><span class="s1">dash </span><span class="s0">import </span><span class="s1">dcc</span>
+<span class="s0">from </span><span class="s1">dash.dependencies </span><span class="s0">import </span><span class="s1">Input</span><span class="s0">, </span><span class="s1">Output</span>
+<span class="s0">import </span><span class="s1">plotly.express </span><span class="s0">as </span><span class="s1">px</span>
+
+<span class="s1">external_stylesheet = [</span>
+    <span class="s1">{</span>
+        <span class="s2">'href'</span><span class="s1">: </span><span class="s2">&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css&quot;</span><span class="s0">,</span>
+        <span class="s2">'rel'</span><span class="s1">: </span><span class="s2">&quot;stylesheet&quot;</span><span class="s0">,</span>
+        <span class="s2">'integrity'</span><span class="s1">: </span><span class="s2">&quot;sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC&quot;</span><span class="s0">,</span>
+        <span class="s2">'crossorigin'</span><span class="s1">: </span><span class="s2">&quot;anonymous&quot;</span>
+    <span class="s1">}</span>
+<span class="s1">]</span>
+
+<span class="s1">patients = pd.read_csv(</span><span class="s2">'state_wise_daily data file IHHPET.csv'</span><span class="s1">)</span>
+<span class="s1">total = patients.shape[</span><span class="s3">0</span><span class="s1">]</span>
+<span class="s1">active = patients[patients[</span><span class="s2">'Status'</span><span class="s1">] == </span><span class="s2">'Confirmed'</span><span class="s1">].shape[</span><span class="s3">0</span><span class="s1">]</span>
+<span class="s1">recovered = patients[patients[</span><span class="s2">'Status'</span><span class="s1">] == </span><span class="s2">'Recovered'</span><span class="s1">].shape[</span><span class="s3">0</span><span class="s1">]</span>
+<span class="s1">deaths = patients[patients[</span><span class="s2">'Status'</span><span class="s1">] == </span><span class="s2">'Deceased'</span><span class="s1">].shape[</span><span class="s3">0</span><span class="s1">]</span>
+
+<span class="s1">options = [</span>
+    <span class="s1">{</span><span class="s2">'label'</span><span class="s1">: </span><span class="s2">'All'</span><span class="s0">, </span><span class="s2">'value'</span><span class="s1">: </span><span class="s2">'All'</span><span class="s1">}</span><span class="s0">,</span>
+    <span class="s1">{</span><span class="s2">'label'</span><span class="s1">: </span><span class="s2">'Hospitalized'</span><span class="s0">, </span><span class="s2">'value'</span><span class="s1">: </span><span class="s2">'Hospitalized'</span><span class="s1">}</span><span class="s0">,</span>
+    <span class="s1">{</span><span class="s2">'label'</span><span class="s1">: </span><span class="s2">'Recovered'</span><span class="s0">, </span><span class="s2">'value'</span><span class="s1">: </span><span class="s2">'Recovered'</span><span class="s1">}</span><span class="s0">,</span>
+    <span class="s1">{</span><span class="s2">'label'</span><span class="s1">: </span><span class="s2">'Deceased'</span><span class="s0">, </span><span class="s2">'value'</span><span class="s1">: </span><span class="s2">'Deceased'</span><span class="s1">}</span>
+<span class="s1">]</span>
+<span class="s1">options1 = [</span>
+    <span class="s1">{</span><span class="s2">'label'</span><span class="s1">: </span><span class="s2">'All'</span><span class="s0">, </span><span class="s2">'value'</span><span class="s1">: </span><span class="s2">'All'</span><span class="s1">}</span><span class="s0">,</span>
+    <span class="s1">{</span><span class="s2">'label'</span><span class="s1">: </span><span class="s2">'Mask'</span><span class="s0">, </span><span class="s2">'value'</span><span class="s1">: </span><span class="s2">'Mask'</span><span class="s1">}</span><span class="s0">,</span>
+    <span class="s1">{</span><span class="s2">'label'</span><span class="s1">: </span><span class="s2">'Sanitizer'</span><span class="s0">, </span><span class="s2">'value'</span><span class="s1">: </span><span class="s2">'Sanitizer'</span><span class="s1">}</span><span class="s0">,</span>
+    <span class="s1">{</span><span class="s2">'label'</span><span class="s1">: </span><span class="s2">'Oxygen'</span><span class="s0">, </span><span class="s2">'value'</span><span class="s1">: </span><span class="s2">'Oxygen'</span><span class="s1">}</span>
+<span class="s1">]</span>
+<span class="s1">options2 = [</span>
+    <span class="s1">{</span><span class="s2">'label'</span><span class="s1">: </span><span class="s2">'Red Zone'</span><span class="s0">, </span><span class="s2">'value'</span><span class="s1">: </span><span class="s2">'Red Zone'</span><span class="s1">}</span><span class="s0">,</span>
+    <span class="s1">{</span><span class="s2">'label'</span><span class="s1">: </span><span class="s2">'Blue Zone'</span><span class="s0">, </span><span class="s2">'value'</span><span class="s1">: </span><span class="s2">'Blue Zone'</span><span class="s1">}</span><span class="s0">,</span>
+    <span class="s1">{</span><span class="s2">'label'</span><span class="s1">: </span><span class="s2">'Green Zone'</span><span class="s0">, </span><span class="s2">'value'</span><span class="s1">: </span><span class="s2">'Green Zone'</span><span class="s1">}</span><span class="s0">,</span>
+    <span class="s1">{</span><span class="s2">'label'</span><span class="s1">: </span><span class="s2">'Orange Zone'</span><span class="s0">, </span><span class="s2">'value'</span><span class="s1">: </span><span class="s2">'Orange Zone'</span><span class="s1">}</span>
+<span class="s1">]</span>
+
+<span class="s1">app = dash.Dash(__name__</span><span class="s0">, </span><span class="s1">external_stylesheets=external_stylesheet)</span>
+
+<span class="s1">app.layout = html.Div([</span>
+    <span class="s1">html.H1(</span><span class="s2">'Corona Virus Pandemic'</span><span class="s0">, </span><span class="s1">style={</span><span class="s2">'color'</span><span class="s1">: </span><span class="s2">'#fff'</span><span class="s0">, </span><span class="s2">'text-align'</span><span class="s1">: </span><span class="s2">'center'</span><span class="s1">})</span><span class="s0">,</span>
+    <span class="s1">html.Div([</span>
+        <span class="s1">html.Div([</span>
+            <span class="s1">html.Div([</span>
+                <span class="s1">html.Div([</span>
+                    <span class="s1">html.H3(</span><span class="s2">'Total Cases'</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'text-light'</span><span class="s1">)</span><span class="s0">,</span>
+                    <span class="s1">html.H4(total</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'text-light'</span><span class="s1">)</span>
+                <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'card-body'</span><span class="s1">)</span>
+            <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'card bg-danger'</span><span class="s1">)</span>
+        <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'col-md-3'</span><span class="s1">)</span><span class="s0">,</span>
+        <span class="s1">html.Div([</span>
+            <span class="s1">html.Div([</span>
+                <span class="s1">html.Div([</span>
+                    <span class="s1">html.H3(</span><span class="s2">'Active Cases'</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'text-light'</span><span class="s1">)</span><span class="s0">,</span>
+                    <span class="s1">html.H4(active</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'text-light'</span><span class="s1">)</span>
+                <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'card-body'</span><span class="s1">)</span>
+            <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'card bg-info'</span><span class="s1">)</span>
+        <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'col-md-3'</span><span class="s1">)</span><span class="s0">,</span>
+        <span class="s1">html.Div([</span>
+            <span class="s1">html.Div([</span>
+                <span class="s1">html.Div([</span>
+                    <span class="s1">html.H3(</span><span class="s2">'Recovered Cases'</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'text-light'</span><span class="s1">)</span><span class="s0">,</span>
+                    <span class="s1">html.H4(recovered</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'text-light'</span><span class="s1">)</span>
+                <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'card-body'</span><span class="s1">)</span>
+            <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'card bg-warning'</span><span class="s1">)</span>
+        <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'col-md-3'</span><span class="s1">)</span><span class="s0">,</span>
+        <span class="s1">html.Div([html.Div([</span>
+            <span class="s1">html.Div([</span>
+                <span class="s1">html.H3(</span><span class="s2">'Total Deaths'</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'text-light'</span><span class="s1">)</span><span class="s0">,</span>
+                <span class="s1">html.H4(deaths</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'text-light'</span><span class="s1">)</span>
+            <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'card-body'</span><span class="s1">)</span>
+        <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'card bg-success'</span><span class="s1">)]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'col-md-3'</span><span class="s1">)</span>
+    <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'row'</span><span class="s1">)</span><span class="s0">,</span>
+    <span class="s1">html.Div([</span>
+        <span class="s1">html.Div([</span>
+            <span class="s1">html.Div([</span>
+                <span class="s1">html.Div([</span>
+                    <span class="s1">dcc.Dropdown(id=</span><span class="s2">'plot-graph'</span><span class="s0">, </span><span class="s1">options=options1</span><span class="s0">, </span><span class="s1">value=</span><span class="s2">'All'</span><span class="s1">)</span><span class="s0">,</span>
+                    <span class="s1">dcc.Graph(id=</span><span class="s2">'graph'</span><span class="s1">)</span>
+                <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'card-body'</span><span class="s1">)</span>
+            <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'card bg-success'</span><span class="s1">)</span>
+        <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'col-md-6'</span><span class="s1">)</span><span class="s0">,</span>
+        <span class="s1">html.Div([</span>
+            <span class="s1">html.Div([</span>
+                <span class="s1">html.Div([</span>
+                    <span class="s1">dcc.Dropdown(id=</span><span class="s2">'my_dropdown'</span><span class="s0">, </span><span class="s1">options=options2</span><span class="s0">, </span><span class="s1">value=</span><span class="s2">'Status'</span><span class="s0">, </span><span class="s1">style={</span><span class="s2">'width'</span><span class="s1">:</span><span class="s2">'100%'</span><span class="s1">})</span><span class="s0">,</span>
+                    <span class="s1">dcc.Graph(id=</span><span class="s2">'the_graph'</span><span class="s1">)</span>
+                <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'card-body'</span><span class="s1">)</span>
+            <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'card bg-info'</span><span class="s1">)</span>
+        <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'col-md-6'</span><span class="s1">)</span>
+    <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'row'</span><span class="s1">)</span><span class="s0">,</span>
+    <span class="s1">html.Div([</span>
+        <span class="s1">html.Div([</span>
+            <span class="s1">html.Div([</span>
+                <span class="s1">html.Div([</span>
+                    <span class="s1">dcc.Dropdown(id=</span><span class="s2">'picker'</span><span class="s0">, </span><span class="s1">options=options</span><span class="s0">, </span><span class="s1">value=</span><span class="s2">'All'</span><span class="s1">)</span><span class="s0">,</span>
+                    <span class="s1">dcc.Graph(id=</span><span class="s2">'bar'</span><span class="s1">)</span>
+                <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'card-body'</span><span class="s1">)</span>
+            <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'card'</span><span class="s1">)</span>
+        <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'col-md-12'</span><span class="s1">)</span>
+    <span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'row'</span><span class="s1">)</span>
+<span class="s1">]</span><span class="s0">, </span><span class="s1">className=</span><span class="s2">'Container'</span><span class="s1">)</span>
+
+
+<span class="s1">@app.callback(Output(</span><span class="s2">'bar'</span><span class="s0">, </span><span class="s2">'figure'</span><span class="s1">)</span><span class="s0">, </span><span class="s1">[Input(</span><span class="s2">'picker'</span><span class="s0">, </span><span class="s2">'value'</span><span class="s1">)])</span>
+<span class="s0">def </span><span class="s1">update_graph(type):</span>
+    <span class="s0">if </span><span class="s1">type == </span><span class="s2">'All'</span><span class="s1">:</span>
+        <span class="s0">return </span><span class="s1">{</span><span class="s2">'data'</span><span class="s1">: [go.Bar(x=patients[</span><span class="s2">'State'</span><span class="s1">]</span><span class="s0">, </span><span class="s1">y=patients[</span><span class="s2">'Total'</span><span class="s1">])]</span><span class="s0">,</span>
+                <span class="s2">'layout'</span><span class="s1">: go.Layout(title=</span><span class="s2">'State Total Count'</span><span class="s0">, </span><span class="s1">plot_bgcolor=</span><span class="s2">'orange'</span><span class="s1">)</span>
+                <span class="s1">}</span>
+    <span class="s0">if </span><span class="s1">type == </span><span class="s2">'Hospitalized'</span><span class="s1">:</span>
+        <span class="s0">return </span><span class="s1">{</span><span class="s2">'data'</span><span class="s1">: [go.Bar(x=patients[</span><span class="s2">'State'</span><span class="s1">]</span><span class="s0">, </span><span class="s1">y=patients[</span><span class="s2">'Hospitalized'</span><span class="s1">])]</span><span class="s0">,</span>
+                <span class="s2">'layout'</span><span class="s1">: go.Layout(title=</span><span class="s2">'State Total Count'</span><span class="s0">, </span><span class="s1">plot_bgcolor=</span><span class="s2">'orange'</span><span class="s1">)</span>
+                <span class="s1">}</span>
+    <span class="s0">if </span><span class="s1">type == </span><span class="s2">'Recovered'</span><span class="s1">:</span>
+        <span class="s0">return </span><span class="s1">{</span><span class="s2">'data'</span><span class="s1">: [go.Bar(x=patients[</span><span class="s2">'State'</span><span class="s1">]</span><span class="s0">, </span><span class="s1">y=patients[</span><span class="s2">'Recovered'</span><span class="s1">])]</span><span class="s0">,</span>
+                <span class="s2">'layout'</span><span class="s1">: go.Layout(title=</span><span class="s2">'State Total Count'</span><span class="s0">, </span><span class="s1">plot_bgcolor=</span><span class="s2">'orange'</span><span class="s1">)</span>
+                <span class="s1">}</span>
+    <span class="s0">if </span><span class="s1">type == </span><span class="s2">'Deceased'</span><span class="s1">:</span>
+        <span class="s0">return </span><span class="s1">{</span><span class="s2">'data'</span><span class="s1">: [go.Bar(x=patients[</span><span class="s2">'State'</span><span class="s1">]</span><span class="s0">, </span><span class="s1">y=patients[</span><span class="s2">'Deceased'</span><span class="s1">])]</span><span class="s0">,</span>
+                <span class="s2">'layout'</span><span class="s1">: go.Layout(title=</span><span class="s2">'State Total Count'</span><span class="s0">, </span><span class="s1">plot_bgcolor=</span><span class="s2">'orange'</span><span class="s1">)</span>
+                <span class="s1">}</span>
+
+
+<span class="s1">@app.callback(Output(</span><span class="s2">'graph'</span><span class="s0">, </span><span class="s2">'figure'</span><span class="s1">)</span><span class="s0">, </span><span class="s1">[Input(</span><span class="s2">'plot-graph'</span><span class="s0">, </span><span class="s2">'value'</span><span class="s1">)])</span>
+<span class="s0">def </span><span class="s1">generate_graph(type):</span>
+    <span class="s0">if </span><span class="s1">type == </span><span class="s2">'All'</span><span class="s1">:</span>
+        <span class="s0">return </span><span class="s1">{</span><span class="s2">'data'</span><span class="s1">: [go.Line(x=patients[</span><span class="s2">'Status'</span><span class="s1">]</span><span class="s0">, </span><span class="s1">y=patients[</span><span class="s2">'Total'</span><span class="s1">])]</span><span class="s0">,</span>
+                <span class="s2">'layout'</span><span class="s1">: go.Layout(title=</span><span class="s2">'Commodities Total Count'</span><span class="s0">, </span><span class="s1">plot_bgcolor=</span><span class="s2">'pink'</span><span class="s1">)}</span>
+    <span class="s0">if </span><span class="s1">type == </span><span class="s2">'Mask'</span><span class="s1">:</span>
+        <span class="s0">return </span><span class="s1">{</span><span class="s2">'data'</span><span class="s1">: [go.Line(x=patients[</span><span class="s2">'Status'</span><span class="s1">]</span><span class="s0">, </span><span class="s1">y=patients[</span><span class="s2">'Mask'</span><span class="s1">])]</span><span class="s0">,</span>
+                <span class="s2">'layout'</span><span class="s1">: go.Layout(title=</span><span class="s2">'Commodities Total Count'</span><span class="s0">, </span><span class="s1">plot_bgcolor=</span><span class="s2">'pink'</span><span class="s1">)}</span>
+    <span class="s0">if </span><span class="s1">type == </span><span class="s2">'Sanitizer'</span><span class="s1">:</span>
+        <span class="s0">return </span><span class="s1">{</span><span class="s2">'data'</span><span class="s1">: [go.Line(x=patients[</span><span class="s2">'Status'</span><span class="s1">]</span><span class="s0">, </span><span class="s1">y=patients[</span><span class="s2">'Sanitizer'</span><span class="s1">])]</span><span class="s0">,</span>
+                <span class="s2">'layout'</span><span class="s1">: go.Layout(title=</span><span class="s2">'Commodities Total Count'</span><span class="s0">, </span><span class="s1">plot_bgcolor=</span><span class="s2">'pink'</span><span class="s1">)}</span>
+    <span class="s0">if </span><span class="s1">type == </span><span class="s2">'Oxygen'</span><span class="s1">:</span>
+        <span class="s0">return </span><span class="s1">{</span><span class="s2">'data'</span><span class="s1">: [go.Line(x=patients[</span><span class="s2">'Status'</span><span class="s1">]</span><span class="s0">, </span><span class="s1">y=patients[</span><span class="s2">'Oxygen'</span><span class="s1">])]</span><span class="s0">,</span>
+                <span class="s2">'layout'</span><span class="s1">: go.Layout(title=</span><span class="s2">'Commodities Total Count'</span><span class="s0">, </span><span class="s1">plot_bgcolor=</span><span class="s2">'pink'</span><span class="s1">)}</span>
+
+
+<span class="s1">@app.callback(Output(</span><span class="s2">'the_graph'</span><span class="s0">, </span><span class="s2">'figure'</span><span class="s1">)</span><span class="s0">, </span><span class="s1">[Input(</span><span class="s2">'my_dropdown'</span><span class="s0">, </span><span class="s2">'value'</span><span class="s1">)])</span>
+<span class="s0">def </span><span class="s1">generate_graph(my_dropdown):</span>
+    <span class="s1">piechart = px.pie(data_frame=patients</span><span class="s0">, </span><span class="s1">names=my_dropdown</span><span class="s0">, </span><span class="s1">hole=</span><span class="s3">0.3</span><span class="s1">)</span>
+    <span class="s0">return </span><span class="s1">(piechart)</span>
+
+
+<span class="s0">if </span><span class="s1">__name__ == </span><span class="s2">'__main__'</span><span class="s1">:</span>
+    <span class="s1">app.run_server(debug=</span><span class="s0">True</span><span class="s1">)</span>
+</pre>
+</body>
+</html>
